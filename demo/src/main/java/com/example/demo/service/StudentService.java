@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.StudentNotFoundException;
 import com.example.demo.repository.StudentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,23 +15,25 @@ public class StudentService {
     private StudentRepository studentRepo;
 
     @Transactional
-    public Student saveStudent(Student student){
+    public Student saveStudent(Student student) {
         return studentRepo.save(student);
     }
 
     @Transactional
-    public List<Student> getAllStudents(){
+    public List<Student> getAllStudents() {
         return studentRepo.findAll();
     }
 
     @Transactional
-    public Student getStudent(Long id){
-        return studentRepo.findById(id).orElseThrow();
+    public Student getStudent(Long id) {
+        return studentRepo.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id)); // ← было неправильно
     }
 
     @Transactional
     public Student updateStudent(Long id, Student updated) {
-        Student student = studentRepo.findById(id).orElseThrow();
+        Student student = studentRepo.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id)); // ← добавил исключение
         student.setName(updated.getName());
         student.setLastname(updated.getLastname());
         student.setEmail(updated.getEmail());
@@ -38,10 +41,11 @@ public class StudentService {
         return studentRepo.save(student);
     }
 
-
     @Transactional
-    public void deleteStudent(Long id){
+    public void deleteStudent(Long id) {
+        if (!studentRepo.existsById(id)) {
+            throw new StudentNotFoundException(id);
+        }
         studentRepo.deleteById(id);
     }
-
 }
