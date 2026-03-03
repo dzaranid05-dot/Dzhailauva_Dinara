@@ -27,13 +27,13 @@ public class StudentService {
     @Transactional
     public Student getStudent(Long id) {
         return studentRepo.findById(id)
-                .orElseThrow(() -> new StudentNotFoundException(id)); // ← было неправильно
+                .orElseThrow(() -> new StudentNotFoundException(id));
     }
 
     @Transactional
     public Student updateStudent(Long id, Student updated) {
         Student student = studentRepo.findById(id)
-                .orElseThrow(() -> new StudentNotFoundException(id)); // ← добавил исключение
+                .orElseThrow(() -> new StudentNotFoundException(id));
         student.setName(updated.getName());
         student.setLastname(updated.getLastname());
         student.setEmail(updated.getEmail());
